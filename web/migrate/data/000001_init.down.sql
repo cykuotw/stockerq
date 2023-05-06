@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS stock_price;
+DROP TABLE IF EXISTS future_price;
+DROP TABLE IF EXISTS option_oi;
