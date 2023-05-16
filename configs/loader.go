@@ -7,8 +7,8 @@ import (
 	env "github.com/joho/godotenv"
 )
 
-func LoadEnv() {
-	dir := os.Getenv("GOPATH") + "/src/expense-logger/.env"
+func loadEnv() {
+	dir := os.Getenv("GOPATH") + "/src/stocker-quant/.env"
 	err := env.Load(dir)
 
 	if err != nil {
