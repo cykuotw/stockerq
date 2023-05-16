@@ -33,6 +33,8 @@ func TestInsertStockPrice(t *testing.T) {
 		assert.Nil(t, err)
 		assert.NotEqual(t, uuid.UUID{}, id)
 		assert.Equal(t, int64(1), rowsAffected)
+
+		deleteTestRecord(id)
 	})
 	t.Run("invalid parameter", func(t *testing.T) {
 		priceInvalid := priceValid
@@ -42,5 +44,7 @@ func TestInsertStockPrice(t *testing.T) {
 		assert.NotNil(t, err)
 		assert.Equal(t, uuid.UUID{}, id)
 		assert.Zero(t, rowsAffected)
+
+		deleteTestRecord(id)
 	})
 }
