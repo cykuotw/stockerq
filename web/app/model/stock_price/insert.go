@@ -10,22 +10,14 @@ import (
 
 const insertStatment = `
 INSERT INTO stock_price (
-	id, 
-	company_id,
-	update_date,
-	price_date,
-	open,
-	close,
-	high,
-	low,
-	change,
-	change_percent,
-	volume,
-	amount
+	id, company_id,
+	update_date, price_date,
+	open, close, high, low,
+	change, change_percent,
+	volume, amount
 ) VALUES (
-	$1, $2, $3, $4, $5, $6, $7, $8, $9, 
-	$10, $11, $12
-)
+	$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
+);
 `
 
 // InsertStockPrice returns the rows that affected
@@ -37,6 +29,10 @@ func InsertStockPrice(price StockPrice) (int64, uuid.UUID, error) {
 
 	db := model.GetDB()
 	id := uuid.New()
+
+	price.UpdateDate = price.UpdateDate.UTC()
+	price.PriceDate = price.PriceDate.UTC()
+
 	result, err := db.Exec(insertStatment,
 		id,
 		price.CompanyID, price.UpdateDate, price.PriceDate,
