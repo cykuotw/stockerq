@@ -78,14 +78,12 @@ func TestGetStockPrice(t *testing.T) {
 			ids[idx] = id
 		}
 
-		result, latestDateUTC, err := stock.GetStockPriceLatest()
+		result, err := stock.GetStockPriceLatest()
 
 		assert.Nil(t, err)
 		assert.Equal(t, 2, len(result))
 		assert.Equal(t, "2330", result[0].CompanyID)
 		assert.Equal(t, "2454", result[1].CompanyID)
-		assert.Equal(t, latestDateUTC, result[0].PriceDate)
-		assert.Equal(t, latestDateUTC, result[1].PriceDate)
 
 		// delete test records
 		for _, id := range ids {
@@ -94,10 +92,9 @@ func TestGetStockPrice(t *testing.T) {
 	})
 
 	t.Run("invalid data", func(t *testing.T) {
-		result, latestDateUTC, err := stock.GetStockPriceLatest()
+		result, err := stock.GetStockPriceLatest()
 
-		assert.NotNil(t, err)
+		assert.Nil(t, err)
 		assert.Nil(t, result)
-		assert.True(t, latestDateUTC.IsZero())
 	})
 }
