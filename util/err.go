@@ -5,10 +5,12 @@ import (
 	"strconv"
 
 	log "github.com/sirupsen/logrus"
+	"go.deanishe.net/env"
 )
 
 func HandleError(err error, errorMsg string) {
-	if err != nil {
+	enableDisplay := env.GetBool("errorMsgOn")
+	if err != nil && enableDisplay {
 		_, file, line, _ := runtime.Caller(1)
 		log.Warn(errorMsg +
 			"\n\t source: " + file +
