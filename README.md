@@ -6,21 +6,19 @@ Project `Stcoker Quant` is aiming to build a quantative analysiss in Taiwan stoc
 ## Migration
 
 ### Requirement
-- `PostgreSQL 12 or above`
-- `psql`
+- `MySQL 8.0 or above`
 - `golang-migrate` ([GitHub Link](https://github.com/golang-migrate/migrate))
-    - Tutorial for PostgreSQL:- [GitHub Link](https://github.com/golang-migrate/migrate/blob/master/database/postgres/TUTORIAL.md)
 
 ### Related commands
-- PostgreSQL localhost server
+- MySQL localhost server
 ```
-    sudo service postgresql start
-    sudo service postgresql status
-    sudo service postgresql stop
+    sudo service mysql start
+    sudo service mysql status
+    sudo service mysql stop
 ```
-- PostgreSQL connection
+- MySQL connection
 ```
-    psql -h {host} -d {table_name} -U {username} -p {port}
+    mysql -h {host} -P {port} -u {username} -p{password} {database}
 ```
 - Create migrations:
 ```
@@ -28,8 +26,8 @@ migrate create -ext sql -dir web/migrate/data -seq init
 ```
 - Perform migrate
 ```
-// POSTGRESQL_URL is:
-// postgres://{username}:{password}@{host}:{port}/{database_name}?sslmode=disable
-migrate -database ${POSTGRESQL_URL} -path web/migrate/data up
-migrate -database ${POSTGRESQL_URL} -path web/migrate/data down
+// MYSQL_URL:
+// mysql://{username}:{password}@tcp{{host}:{port})/{database_name}
+migrate -database "${MYSQL_URL}" -path web/migrate/data up
+migrate -database "${MYSQL_URL}" -path web/migrate/data down
 ```
