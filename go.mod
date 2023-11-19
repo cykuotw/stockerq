@@ -5,8 +5,8 @@ go 1.20
 require github.com/joho/godotenv v1.5.1
 
 require (
+	github.com/go-sql-driver/mysql v1.7.1
 	github.com/google/uuid v1.3.0
-	github.com/lib/pq v1.10.9
 	github.com/sirupsen/logrus v1.9.0
 	github.com/stretchr/testify v1.8.2
 	go.deanishe.net/env v0.5.1
