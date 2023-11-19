@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"stocker-quant/util"
 
-	_ "github.com/lib/pq"
+	_ "github.com/go-sql-driver/mysql"
 	log "github.com/sirupsen/logrus"
 	"go.deanishe.net/env"
 )
@@ -21,8 +21,8 @@ func Connect() {
 	dbname := env.Get("dbDatabase")
 	option := env.Get("dbOption")
 
-	connInfo := "postgres://" + username + ":" + password + "@" + host + ":" + port + "/" + dbname + "?" + option
-	dbConnection, err = sql.Open("postgres", connInfo)
+	connInfo := username + ":" + password + "@tcp(" + host + ":" + port + ")/" + dbname + "?" + option
+	dbConnection, err = sql.Open("mysql", connInfo)
 	util.HandleError(err, "Database Connection Fail")
 
 	err = dbConnection.Ping()
