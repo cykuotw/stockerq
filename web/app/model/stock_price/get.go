@@ -28,12 +28,19 @@ func GetStockPriceLatest() ([]StockPrice, error) {
 	}
 
 	for rows.Next() {
+		var id uint64
+		var priceDate string
+		var updateDate string
 		var tmpPrice StockPrice
-		err := rows.Scan(&tmpPrice.Id, &tmpPrice.CompanyID,
-			&tmpPrice.UpdateDate, &tmpPrice.PriceDate,
+		err := rows.Scan(&id,
+			&tmpPrice.Uuid, &tmpPrice.CompanyID,
+			&updateDate, &priceDate,
 			&tmpPrice.Open, &tmpPrice.Close, &tmpPrice.High, &tmpPrice.Low,
-			&tmpPrice.Change, &tmpPrice.ChangePercent,
+			&tmpPrice.PriceChange, &tmpPrice.ChangePercent,
 			&tmpPrice.Volume, &tmpPrice.Amount)
+		tmpPrice.PriceDate, err = time.Parse("2006-01-02", priceDate)
+		tmpPrice.UpdateDate, err = time.Parse("2006-01-02 15:04:05", updateDate)
+
 		util.HandleError(err, "Scan rows to StockPrice struct Fail")
 		if err != nil {
 			continue
@@ -76,12 +83,19 @@ func GetStockPrice(startDate time.Time, endDate time.Time) ([]StockPrice, error)
 	}
 
 	for rows.Next() {
+		var id uint64
+		var priceDate string
+		var updateDate string
 		var tmpPrice StockPrice
-		err := rows.Scan(&tmpPrice.Id, &tmpPrice.CompanyID,
-			&tmpPrice.UpdateDate, &tmpPrice.PriceDate,
+		err := rows.Scan(&id,
+			&tmpPrice.Uuid, &tmpPrice.CompanyID,
+			&updateDate, &priceDate,
 			&tmpPrice.Open, &tmpPrice.Close, &tmpPrice.High, &tmpPrice.Low,
-			&tmpPrice.Change, &tmpPrice.ChangePercent,
+			&tmpPrice.PriceChange, &tmpPrice.ChangePercent,
 			&tmpPrice.Volume, &tmpPrice.Amount)
+		tmpPrice.PriceDate, err = time.Parse("2006-01-02", priceDate)
+		tmpPrice.UpdateDate, err = time.Parse("2006-01-02 15:04:05", updateDate)
+
 		util.HandleError(err, "Scan rows to StockPrice struct Fail")
 		if err != nil {
 			continue

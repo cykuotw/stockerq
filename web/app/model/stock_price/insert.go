@@ -8,18 +8,6 @@ import (
 	"github.com/google/uuid"
 )
 
-const insertStatment = `
-INSERT INTO stock_price (
-	id, company_id,
-	update_date, price_date,
-	open, close, high, low,
-	change, change_percent,
-	volume, amount
-) VALUES (
-	$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
-);
-`
-
 // InsertStockPrice returns the rows that affected
 // by insert statement
 func InsertStockPrice(price StockPrice) (int64, uuid.UUID, error) {
@@ -29,17 +17,26 @@ func InsertStockPrice(price StockPrice) (int64, uuid.UUID, error) {
 
 	db := model.GetDB()
 	id := uuid.New()
-
 	price.UpdateDate = price.UpdateDate.UTC()
 	price.PriceDate = price.PriceDate.UTC()
 
-	result, err := db.Exec(insertStatment,
-		id,
-		price.CompanyID, price.UpdateDate, price.PriceDate,
+	insertStatment := fmt.Sprintf(`INSERT INTO stock_price (
+		uuid, company_id, update_date, price_date, open, close, high, low,
+		price_change, change_percent, volume, amount
+	) VALUES (
+		'%s', '%s', 
+		'%s', '%s', 
+		%d, %d, %d, %d,
+		%d, %d, %d, %d);`,
+		id.String(), price.CompanyID,
+		price.UpdateDate.Format("2006-01-02 15:04:05"),
+		price.PriceDate.Format("2006-01-02"),
 		price.Open, price.Close, price.High, price.Low,
-		price.Change, price.ChangePercent,
+		price.PriceChange, price.ChangePercent,
 		price.Volume, price.Amount,
 	)
+
+	result, err := db.Exec(insertStatment)
 	util.HandleError(err, "Insert Daily Stock Price Fail")
 	if err != nil {
 		return 0, uuid.UUID{}, err

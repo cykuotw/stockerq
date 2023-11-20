@@ -22,7 +22,7 @@ func TestInsertStockPrice(t *testing.T) {
 		Close:         50300,
 		High:          50800,
 		Low:           50000,
-		Change:        -700,
+		PriceChange:   -700,
 		ChangePercent: -139,
 		Volume:        19385820,
 		Amount:        9753130414,
