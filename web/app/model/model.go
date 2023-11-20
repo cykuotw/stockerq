@@ -11,21 +11,33 @@ import (
 )
 
 var dbConnection *sql.DB
+var dbAdminConnection *sql.DB
 var err error
 
 func Connect() {
 	username := env.Get("dbUsername")
 	password := env.Get("dbPassword")
+	adminuser := env.Get("dbAdmin")
+	adminpass := env.Get("dbAdminPassword")
 	port := env.Get("dbPort")
 	host := env.Get("dbHost")
 	dbname := env.Get("dbDatabase")
 	option := env.Get("dbOption")
 
+	// user connect
 	connInfo := username + ":" + password + "@tcp(" + host + ":" + port + ")/" + dbname + "?" + option
 	dbConnection, err = sql.Open("mysql", connInfo)
 	util.HandleError(err, "Database Connection Fail")
 
 	err = dbConnection.Ping()
+	util.HandleError(err, "Database Connection Fail")
+
+	// admin connect
+	connInfo = adminuser + ":" + adminpass + "@tcp(" + host + ":" + port + ")/" + dbname + "?" + option
+	dbAdminConnection, err = sql.Open("mysql", connInfo)
+	util.HandleError(err, "Database Connection Fail")
+
+	err = dbAdminConnection.Ping()
 	util.HandleError(err, "Database Connection Fail")
 
 	log.Info("Database Connected.")
@@ -56,4 +68,8 @@ func Close() {
 
 func GetDB() *sql.DB {
 	return dbConnection
+}
+
+func GetAdminDB() *sql.DB {
+	return dbAdminConnection
 }
