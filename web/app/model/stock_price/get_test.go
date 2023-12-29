@@ -1,7 +1,7 @@
 package stock_price_test
 
 import (
-	stock "stocker-quant/web/app/model/stock_price"
+	stock "stocker-hf-data/web/app/model/stock_price"
 	"testing"
 	"time"
 

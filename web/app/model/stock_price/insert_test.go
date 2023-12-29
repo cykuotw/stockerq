@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	stock "stocker-quant/web/app/model/stock_price"
+	stock "stocker-hf-data/web/app/model/stock_price"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"stocker-quant/configs"
-	"stocker-quant/web/app"
+	"stocker-hf-data/configs"
+	"stocker-hf-data/web/app"
 )
 
 func main() {

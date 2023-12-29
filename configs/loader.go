@@ -8,7 +8,7 @@ import (
 )
 
 func loadEnv() {
-	dir := os.Getenv("GOPATH") + "/src/stocker-quant/.env"
+	dir := os.Getenv("GOPATH") + "/src/stocker-hf-data/.env"
 	err := env.Load(dir)
 
 	if err != nil {

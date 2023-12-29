@@ -1,4 +1,4 @@
-module stocker-quant
+module stocker-hf-data
 
 go 1.20
 
