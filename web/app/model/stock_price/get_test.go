@@ -1,6 +1,7 @@
 package stock_price_test
 
 import (
+	apperror "stocker-hf-data/web/app/app-error"
 	stock "stocker-hf-data/web/app/model/stock_price"
 	"testing"
 	"time"
@@ -10,10 +11,7 @@ import (
 )
 
 func TestGetStockPriceLatest(t *testing.T) {
-	testPrep()
-	defer testClose()
-
-	validPrice := []stock.StockPrice{
+	prices := []stock.StockPrice{
 		{
 			CompanyID:     "2330",
 			UpdateDate:    time.Now(),
@@ -68,43 +66,58 @@ func TestGetStockPriceLatest(t *testing.T) {
 		},
 	}
 
-	t.Run("valid data", func(t *testing.T) {
-		ids := make([]uuid.UUID, len(validPrice))
+	testPrep()
+	defer testClose()
 
-		// insert test records
-		for idx, p := range validPrice {
-			id := insertTestRecord(p)
-			ids[idx] = id
-		}
-
-		result, err := stock.GetStockPriceLatest()
-
-		assert.Nil(t, err)
-		assert.Equal(t, 2, len(result))
-		if len(result) != 0 {
-			assert.Equal(t, "2330", result[0].CompanyID)
-			assert.Equal(t, "2454", result[1].CompanyID)
-		}
-
-		// delete test records
+	ids := make([]uuid.UUID, len(prices))
+	// insert test records
+	for idx, p := range prices {
+		id := insertTestRecord(p)
+		ids[idx] = id
+	}
+	defer func() {
 		for _, id := range ids {
 			deleteTestRecord(id)
 		}
-	})
+	}()
 
-	t.Run("invalid data", func(t *testing.T) {
-		result, err := stock.GetStockPriceLatest()
+	type testcase struct {
+		name            string
+		expectFail      bool
+		expectCount     int
+		expectCompanyID []string
+		expectError     *apperror.ModelError
+	}
 
-		assert.Nil(t, err)
-		assert.Nil(t, result)
-	})
+	subtests := []testcase{
+		{
+			name:            "valid",
+			expectFail:      false,
+			expectCount:     2,
+			expectCompanyID: []string{"2330", "2454"},
+			expectError:     nil,
+		},
+	}
+
+	for _, test := range subtests {
+		t.Run(test.name, func(t *testing.T) {
+			results, err := stock.GetStockPriceLatest()
+
+			if test.expectFail {
+				assert.NotNil(t, err)
+			} else {
+				assert.Equal(t, test.expectCount, len(results))
+				for idx, c := range test.expectCompanyID {
+					assert.Equal(t, c, results[idx].CompanyID)
+				}
+				assert.Nil(t, err)
+			}
+		})
+	}
 }
 
 func TestGetStockPrice(t *testing.T) {
-	testPrep()
-	defer testClose()
-
-	validPrice := []stock.StockPrice{
+	prices := []stock.StockPrice{
 		{
 			CompanyID:     "2330",
 			UpdateDate:    time.Now(),
@@ -159,55 +172,76 @@ func TestGetStockPrice(t *testing.T) {
 		},
 	}
 
-	t.Run("valid data", func(t *testing.T) {
-		ids := make([]uuid.UUID, len(validPrice))
+	testPrep()
+	defer testClose()
 
-		// insert test records
-		for idx, p := range validPrice {
-			id := insertTestRecord(p)
-			ids[idx] = id
-		}
-
-		now := time.Now()
-		today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
-		tomorrow := today.AddDate(0, 0, 1)
-		result, err := stock.GetStockPrice(today, tomorrow)
-
-		assert.Nil(t, err)
-		assert.Equal(t, 2, len(result))
-		if len(result) != 0 {
-			assert.Equal(t, "2330", result[0].CompanyID)
-			assert.Equal(t, "2454", result[1].CompanyID)
-		}
-
-		// delete test records
+	ids := make([]uuid.UUID, len(prices))
+	// insert test records
+	for idx, p := range prices {
+		id := insertTestRecord(p)
+		ids[idx] = id
+	}
+	defer func() {
 		for _, id := range ids {
 			deleteTestRecord(id)
 		}
-	})
+	}()
 
-	t.Run("invalid data", func(t *testing.T) {
-		// zero time
-		result, err := stock.GetStockPrice(time.Time{}, time.Time{})
-		assert.Nil(t, result)
-		assert.NotNil(t, err)
+	type testcase struct {
+		name            string
+		endDate         time.Time
+		startDate       time.Time
+		expectFail      bool
+		expectCount     int
+		expectCompanyID []string
+		expectError     *apperror.ModelError
+	}
 
-		result, err = stock.GetStockPrice(time.Now(), time.Time{})
-		assert.Nil(t, result)
-		assert.NotNil(t, err)
+	subtests := []testcase{
+		{
+			name:            "valid",
+			startDate:       time.Now(),
+			endDate:         time.Now().AddDate(0, 0, 1),
+			expectFail:      false,
+			expectCount:     2,
+			expectCompanyID: []string{"2330", "2454"},
+			expectError:     nil,
+		},
+		{
+			name:            "invalid zero time",
+			endDate:         time.Time{},
+			startDate:       time.Time{},
+			expectFail:      true,
+			expectCount:     0,
+			expectCompanyID: nil,
+			expectError:     apperror.NewModelError(apperror.ErrZeroDate),
+		},
+		{
+			name:            "invalid early endDate",
+			endDate:         time.Now(),
+			startDate:       time.Now(),
+			expectFail:      true,
+			expectCount:     0,
+			expectCompanyID: nil,
+			expectError:     apperror.NewModelError(apperror.ErrReverseDate),
+		},
+	}
 
-		result, err = stock.GetStockPrice(time.Time{}, time.Now())
-		assert.Nil(t, result)
-		assert.NotNil(t, err)
+	for _, test := range subtests {
+		t.Run(test.name, func(t *testing.T) {
+			results, err := stock.GetStockPrice(test.startDate, test.endDate)
 
-		// early endDate
-		now := time.Now()
-		result, err = stock.GetStockPrice(now, now)
-		assert.Nil(t, result)
-		assert.NotNil(t, err)
-
-		result, err = stock.GetStockPrice(now, now)
-		assert.Nil(t, result)
-		assert.NotNil(t, err)
-	})
+			if test.expectFail {
+				assert.Nil(t, results)
+				assert.NotNil(t, err)
+				assert.Equal(t, test.expectError.Unwrap(), err.Unwrap())
+			} else {
+				assert.Equal(t, test.expectCount, len(results))
+				for _, p := range results {
+					assert.Contains(t, test.expectCompanyID, p.CompanyID)
+				}
+				assert.Nil(t, err)
+			}
+		})
+	}
 }
