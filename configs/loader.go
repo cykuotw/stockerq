@@ -8,7 +8,13 @@ import (
 )
 
 func loadEnv() {
-	dir := os.Getenv("GOPATH") + "/src/stocker-hf-data/.env"
+	exeMode := os.Getenv("executeMode")
+	dir := ""
+	if exeMode == "Debug" || exeMode == "" {
+		dir = os.Getenv("GOPATH") + "/src/stocker-hf-data/.env"
+	} else if exeMode == "Release" {
+		dir = "./.env"
+	}
 	err := env.Load(dir)
 
 	if err != nil {
