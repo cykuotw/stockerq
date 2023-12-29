@@ -2,12 +2,12 @@ package stock_price
 
 import (
 	"fmt"
-	"stocker-quant/util"
-	"stocker-quant/web/app/model"
+	apperror "stocker-hf-data/web/app/app-error"
+	"stocker-hf-data/web/app/model"
 	"time"
 )
 
-func GetStockPriceLatest() ([]StockPrice, error) {
+func GetStockPriceLatest() ([]StockPrice, *apperror.ModelError) {
 	// variables declare
 	db := model.GetDB()
 	var results []StockPrice
@@ -24,7 +24,7 @@ func GetStockPriceLatest() ([]StockPrice, error) {
 				);`)
 	defer rows.Close()
 	if err != nil {
-		return nil, err
+		return nil, apperror.NewModelError(err)
 	}
 
 	for rows.Next() {
@@ -41,9 +41,8 @@ func GetStockPriceLatest() ([]StockPrice, error) {
 		tmpPrice.PriceDate, err = time.Parse("2006-01-02", priceDate)
 		tmpPrice.UpdateDate, err = time.Parse("2006-01-02 15:04:05", updateDate)
 
-		util.HandleError(err, "Scan rows to StockPrice struct Fail")
 		if err != nil {
-			continue
+			return nil, apperror.NewModelError(err)
 		}
 
 		results = append(results, tmpPrice)
@@ -52,13 +51,13 @@ func GetStockPriceLatest() ([]StockPrice, error) {
 	return results, nil
 }
 
-func GetStockPrice(startDate time.Time, endDate time.Time) ([]StockPrice, error) {
+func GetStockPrice(startDate time.Time, endDate time.Time) ([]StockPrice, *apperror.ModelError) {
 	// error check
 	if startDate.IsZero() || endDate.IsZero() {
-		return nil, fmt.Errorf("parameter error: startDate and endDate are neither zero")
+		return nil, apperror.NewModelError(apperror.ErrZeroDate)
 	}
 	if startDate.Compare(endDate) != -1 {
-		return nil, fmt.Errorf("parameter error: startDate much be ealier than endDate")
+		return nil, apperror.NewModelError(apperror.ErrReverseDate)
 	}
 
 	// variable declare
@@ -79,7 +78,7 @@ func GetStockPrice(startDate time.Time, endDate time.Time) ([]StockPrice, error)
 	defer rows.Close()
 
 	if err != nil {
-		return nil, err
+		return nil, apperror.NewModelError(err)
 	}
 
 	for rows.Next() {
@@ -96,9 +95,8 @@ func GetStockPrice(startDate time.Time, endDate time.Time) ([]StockPrice, error)
 		tmpPrice.PriceDate, err = time.Parse("2006-01-02", priceDate)
 		tmpPrice.UpdateDate, err = time.Parse("2006-01-02 15:04:05", updateDate)
 
-		util.HandleError(err, "Scan rows to StockPrice struct Fail")
 		if err != nil {
-			continue
+			return nil, apperror.NewModelError(err)
 		}
 
 		result = append(result, tmpPrice)

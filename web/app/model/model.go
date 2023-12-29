@@ -3,7 +3,7 @@ package model
 import (
 	"database/sql"
 	"fmt"
-	"stocker-quant/util"
+	apperror "stocker-hf-data/web/app/app-error"
 
 	_ "github.com/go-sql-driver/mysql"
 	log "github.com/sirupsen/logrus"
@@ -14,7 +14,7 @@ var dbConnection *sql.DB
 var dbAdminConnection *sql.DB
 var err error
 
-func Connect() {
+func Connect() *apperror.ModelError {
 	username := env.Get("dbUsername")
 	password := env.Get("dbPassword")
 	adminuser := env.Get("dbAdmin")
@@ -27,25 +27,36 @@ func Connect() {
 	// user connect
 	connInfo := username + ":" + password + "@tcp(" + host + ":" + port + ")/" + dbname + "?" + option
 	dbConnection, err = sql.Open("mysql", connInfo)
-	util.HandleError(err, "Database Connection Fail")
+	if err != nil {
+		return apperror.NewModelError(apperror.ErrDbConnectFail)
+	}
 
 	err = dbConnection.Ping()
-	util.HandleError(err, "Database Connection Fail")
+	if err != nil {
+		return apperror.NewModelError(apperror.ErrDbConnectFail)
+	}
 
 	// admin connect
 	connInfo = adminuser + ":" + adminpass + "@tcp(" + host + ":" + port + ")/" + dbname + "?" + option
 	dbAdminConnection, err = sql.Open("mysql", connInfo)
-	util.HandleError(err, "Database Connection Fail")
+	if err != nil {
+		return apperror.NewModelError(apperror.ErrDbConnectFail)
+	}
 
 	err = dbAdminConnection.Ping()
-	util.HandleError(err, "Database Connection Fail")
+	if err != nil {
+		return apperror.NewModelError(apperror.ErrDbConnectFail)
+	}
 
 	log.Info("Database Connected.")
+	return nil
 }
 
-func TestQuery() {
+func TestQuery() *apperror.ModelError {
 	rows, err := dbConnection.Query("SELECT * FROM schema_migrations")
-	util.HandleError(err, "Test Query Fail")
+	if err != nil {
+		return apperror.NewModelError(apperror.ErrDbTestFail)
+	}
 
 	for rows.Next() {
 		var (
@@ -57,13 +68,17 @@ func TestQuery() {
 		}
 		fmt.Println(version, dirty)
 	}
+	return nil
 }
 
-func Close() {
+func Close() *apperror.ModelError {
 	err := dbConnection.Close()
-	util.HandleError(err, "Database Disconnection Fail")
+	if err != nil {
+		return apperror.NewModelError(err)
+	}
 
 	log.Info("Database Disconnected.")
+	return nil
 }
 
 func GetDB() *sql.DB {

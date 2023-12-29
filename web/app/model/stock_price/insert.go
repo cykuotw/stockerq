@@ -2,17 +2,17 @@ package stock_price
 
 import (
 	"fmt"
-	"stocker-quant/util"
-	"stocker-quant/web/app/model"
+	apperror "stocker-hf-data/web/app/app-error"
+	"stocker-hf-data/web/app/model"
 
 	"github.com/google/uuid"
 )
 
 // InsertStockPrice returns the rows that affected
 // by insert statement
-func InsertStockPrice(price StockPrice) (int64, uuid.UUID, error) {
+func InsertStockPrice(price StockPrice) (int64, uuid.UUID, *apperror.ModelError) {
 	if !price.isValid() {
-		return 0, uuid.UUID{}, fmt.Errorf("invalid parameter")
+		return 0, uuid.UUID{}, apperror.NewModelError(apperror.ErrInputPriceNotValid)
 	}
 
 	db := model.GetDB()
@@ -37,9 +37,8 @@ func InsertStockPrice(price StockPrice) (int64, uuid.UUID, error) {
 	)
 
 	result, err := db.Exec(insertStatment)
-	util.HandleError(err, "Insert Daily Stock Price Fail")
 	if err != nil {
-		return 0, uuid.UUID{}, err
+		return 0, uuid.UUID{}, apperror.NewModelError(err)
 	}
 
 	rowsAffected, _ := result.RowsAffected()
