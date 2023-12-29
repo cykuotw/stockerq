@@ -52,11 +52,11 @@ func GetStockPriceLatest() ([]StockPrice, *apperror.ModelError) {
 }
 
 func GetStockPrice(startDate time.Time, endDate time.Time) ([]StockPrice, *apperror.ModelError) {
-	// error check
 	if startDate.IsZero() || endDate.IsZero() {
 		return nil, apperror.NewModelError(apperror.ErrZeroDate)
 	}
-	if startDate.Compare(endDate) != -1 {
+	diff := endDate.Sub(startDate)
+	if diff < 0 {
 		return nil, apperror.NewModelError(apperror.ErrReverseDate)
 	}
 
