@@ -29,7 +29,7 @@ func (price *StockPrice) isValid() bool {
 	result = result && (price.Close > 0)
 	result = result && (price.High > 0)
 	result = result && (price.Low > 0)
-	result = result && (price.ChangePercent-int64((float64(price.PriceChange)/float64(price.Close))*10000) < 2)
+	result = result && (price.ChangePercent-int64((float64(price.PriceChange)/float64(price.Close))*10000) < 50)
 	result = result && (price.Volume >= 0)
 	result = result && (price.Amount >= 0)
 
