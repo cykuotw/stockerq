@@ -1,8 +1,8 @@
 package stock_price_test
 
 import (
-	apperror "stocker-hf-data/web/app/app-error"
-	stock "stocker-hf-data/web/app/model/stock_price"
+	apperror "stockerq/web/app/app-error"
+	stock "stockerq/web/app/model/stock_price"
 	"testing"
 	"time"
 

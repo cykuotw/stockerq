@@ -3,7 +3,7 @@ package model
 import (
 	"database/sql"
 	"fmt"
-	apperror "stocker-hf-data/web/app/app-error"
+	apperror "stockerq/web/app/app-error"
 
 	_ "github.com/go-sql-driver/mysql"
 	log "github.com/sirupsen/logrus"

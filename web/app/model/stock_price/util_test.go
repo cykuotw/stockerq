@@ -2,9 +2,9 @@ package stock_price_test
 
 import (
 	"fmt"
-	"stocker-hf-data/configs"
-	"stocker-hf-data/web/app/model"
-	"stocker-hf-data/web/app/model/stock_price"
+	"stockerq/configs"
+	"stockerq/web/app/model"
+	"stockerq/web/app/model/stock_price"
 
 	"github.com/google/uuid"
 )

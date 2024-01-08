@@ -1,4 +1,4 @@
-module stocker-hf-data
+module stockerq
 
 go 1.20
 

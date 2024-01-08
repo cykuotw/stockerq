@@ -2,8 +2,8 @@ package stock_price
 
 import (
 	"fmt"
-	apperror "stocker-hf-data/web/app/app-error"
-	"stocker-hf-data/web/app/model"
+	apperror "stockerq/web/app/app-error"
+	"stockerq/web/app/model"
 	"time"
 )
 

@@ -1,6 +1,6 @@
 package app
 
-import "stocker-hf-data/web/app/model"
+import "stockerq/web/app/model"
 
 func Init() {
 	model.Connect()

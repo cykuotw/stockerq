@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	apperror "stocker-hf-data/web/app/app-error"
-	stock "stocker-hf-data/web/app/model/stock_price"
+	apperror "stockerq/web/app/app-error"
+	stock "stockerq/web/app/model/stock_price"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"

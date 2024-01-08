@@ -11,7 +11,7 @@ func loadEnv() {
 	exeMode := os.Getenv("executeMode")
 	dir := ""
 	if exeMode == "Debug" || exeMode == "" {
-		dir = os.Getenv("GOPATH") + "/src/stocker-hf-data/.env"
+		dir = os.Getenv("GOPATH") + "/src/stockerq/.env"
 	} else if exeMode == "Release" {
 		dir = "./.env"
 	}
