@@ -7,7 +7,7 @@ import (
 
 type ModelError struct {
 	Layer string
-	Err   appError
+	Err   AppError
 }
 
 func (e *ModelError) Error() string {
@@ -26,7 +26,7 @@ func NewModelError(err error) (e *ModelError) {
 
 	return &ModelError{
 		Layer: "Model",
-		Err: appError{
+		Err: AppError{
 			Err:            err,
 			CallerFile:     frame.File,
 			CallerLine:     frame.Line,

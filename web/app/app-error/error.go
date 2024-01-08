@@ -27,18 +27,18 @@ var (
 	ErrReverseDate = errors.New("startDate much be ealier than endDate")
 )
 
-type appError struct {
+type AppError struct {
 	Err            error
 	CallerFile     string
 	CallerLine     int
 	CallerFunction string
 }
 
-func (e *appError) Error() string {
-	return fmt.Sprintf("%s:%d %s\nerror: %s",
+func (e *AppError) Error() string {
+	return fmt.Sprintf("%s:%d %s error:%s",
 		e.CallerFile, e.CallerLine, e.CallerFunction, e.Err)
 }
 
-func (e *appError) Unwrap() error {
+func (e *AppError) Unwrap() error {
 	return e.Err
 }

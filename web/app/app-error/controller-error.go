@@ -7,7 +7,7 @@ import (
 
 type ControllerError struct {
 	Layer string
-	Err   appError
+	Err   AppError
 }
 
 func (e *ControllerError) Error() string {
@@ -18,7 +18,7 @@ func (e *ControllerError) Unwrap() error {
 	return e.Err.Unwrap()
 }
 
-func NewControllerError(op string, err error, handler string) (e *ControllerError) {
+func NewControllerError(err error) (e *ControllerError) {
 	pc := make([]uintptr, 15)
 	n := runtime.Callers(2, pc)
 	frames := runtime.CallersFrames(pc[:n])
@@ -26,7 +26,7 @@ func NewControllerError(op string, err error, handler string) (e *ControllerErro
 
 	return &ControllerError{
 		Layer: "Controller",
-		Err: appError{
+		Err: AppError{
 			Err:            err,
 			CallerFile:     frame.File,
 			CallerLine:     frame.Line,

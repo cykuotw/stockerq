@@ -7,7 +7,7 @@ import (
 
 type RoutingError struct {
 	Layer string
-	Err   appError
+	Err   AppError
 }
 
 func (e *RoutingError) Error() string {
@@ -18,7 +18,7 @@ func (e *RoutingError) Unwrap() error {
 	return e.Err.Unwrap()
 }
 
-func NewRoutingError(op string, err error, route string) (e *RoutingError) {
+func NewRoutingError(err error) (e *RoutingError) {
 	pc := make([]uintptr, 15)
 	n := runtime.Callers(2, pc)
 	frames := runtime.CallersFrames(pc[:n])
@@ -26,7 +26,7 @@ func NewRoutingError(op string, err error, route string) (e *RoutingError) {
 
 	return &RoutingError{
 		Layer: "Routing",
-		Err: appError{
+		Err: AppError{
 			Err:            err,
 			CallerFile:     frame.File,
 			CallerLine:     frame.Line,
