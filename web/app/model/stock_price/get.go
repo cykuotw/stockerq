@@ -7,51 +7,51 @@ import (
 	"time"
 )
 
-func GetStockPriceLatest() ([]StockPrice, *apperror.ModelError) {
+func GetStockPriceLatest(companyId string) (StockPrice, *apperror.ModelError) {
 	// variables declare
 	db := model.GetDB()
-	var results []StockPrice
+	var result StockPrice
 
 	// find records with latest date
-	rows, err := db.Query(`
-				SELECT * FROM stock_price WHERE price_date = 
-				(
-					SELECT price_date 
-					FROM stock_price 
-					GROUP BY price_date
-					ORDER BY price_date DESC
-					LIMIT 1
-				);`)
-	defer rows.Close()
+	query := fmt.Sprintf(`
+		SELECT * FROM stock_price 
+		WHERE company_id = '%s'
+			AND price_date = 
+		(
+			SELECT price_date 
+			FROM stock_price 
+			GROUP BY price_date
+			ORDER BY price_date DESC
+			LIMIT 1
+		);`, companyId)
+	rows, err := db.Query(query)
 	if err != nil {
-		return nil, apperror.NewModelError(err)
+		return StockPrice{}, apperror.NewModelError(err)
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		var id uint64
 		var priceDate string
 		var updateDate string
-		var tmpPrice StockPrice
 		err := rows.Scan(&id,
-			&tmpPrice.Uuid, &tmpPrice.CompanyID,
+			&result.Uuid, &result.CompanyID,
 			&updateDate, &priceDate,
-			&tmpPrice.Open, &tmpPrice.Close, &tmpPrice.High, &tmpPrice.Low,
-			&tmpPrice.PriceChange, &tmpPrice.ChangePercent,
-			&tmpPrice.Volume, &tmpPrice.Amount)
-		tmpPrice.PriceDate, err = time.Parse("2006-01-02", priceDate)
-		tmpPrice.UpdateDate, err = time.Parse("2006-01-02 15:04:05", updateDate)
+			&result.Open, &result.Close, &result.High, &result.Low,
+			&result.PriceChange, &result.ChangePercent,
+			&result.Volume, &result.Amount)
+		result.PriceDate, err = time.Parse("2006-01-02", priceDate)
+		result.UpdateDate, err = time.Parse("2006-01-02 15:04:05", updateDate)
 
 		if err != nil {
-			return nil, apperror.NewModelError(err)
+			return StockPrice{}, apperror.NewModelError(err)
 		}
-
-		results = append(results, tmpPrice)
 	}
 
-	return results, nil
+	return result, nil
 }
 
-func GetStockPrice(startDate time.Time, endDate time.Time) ([]StockPrice, *apperror.ModelError) {
+func GetStockPrice(companyId string, startDate time.Time, endDate time.Time) ([]StockPrice, *apperror.ModelError) {
 	if startDate.IsZero() || endDate.IsZero() {
 		return nil, apperror.NewModelError(apperror.ErrZeroDate)
 	}
@@ -70,7 +70,9 @@ func GetStockPrice(startDate time.Time, endDate time.Time) ([]StockPrice, *apper
 	// find price between startDate and endDate
 	strQuery := fmt.Sprintf(`
 			SELECT * FROM stock_price 
-			WHERE price_date BETWEEN '%d-%d-%d' AND '%d-%d-%d';`,
+			WHERE company_id = '%s'
+				AND price_date BETWEEN '%d-%d-%d' AND '%d-%d-%d';`,
+		companyId,
 		startDate.Year(), startDate.Month(), startDate.Day(),
 		endDate.Year(), endDate.Month(), endDate.Day(),
 	)

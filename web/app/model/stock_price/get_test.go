@@ -83,8 +83,8 @@ func TestGetStockPriceLatest(t *testing.T) {
 
 	type testcase struct {
 		name            string
+		companyId       string
 		expectFail      bool
-		expectCount     int
 		expectCompanyID []string
 		expectError     *apperror.ModelError
 	}
@@ -92,24 +92,21 @@ func TestGetStockPriceLatest(t *testing.T) {
 	subtests := []testcase{
 		{
 			name:            "valid",
+			companyId:       "2330",
 			expectFail:      false,
-			expectCount:     2,
-			expectCompanyID: []string{"2330", "2454"},
+			expectCompanyID: []string{"2330"},
 			expectError:     nil,
 		},
 	}
 
 	for _, test := range subtests {
 		t.Run(test.name, func(t *testing.T) {
-			results, err := stock.GetStockPriceLatest()
+			result, err := stock.GetStockPriceLatest(test.companyId)
 
 			if test.expectFail {
 				assert.NotNil(t, err)
 			} else {
-				assert.Equal(t, test.expectCount, len(results))
-				for idx, c := range test.expectCompanyID {
-					assert.Equal(t, c, results[idx].CompanyID)
-				}
+				assert.Contains(t, test.expectCompanyID, result.CompanyID)
 				assert.Nil(t, err)
 			}
 		})
@@ -189,6 +186,7 @@ func TestGetStockPrice(t *testing.T) {
 
 	type testcase struct {
 		name            string
+		companyId       string
 		endDate         time.Time
 		startDate       time.Time
 		expectFail      bool
@@ -200,15 +198,17 @@ func TestGetStockPrice(t *testing.T) {
 	subtests := []testcase{
 		{
 			name:            "valid",
+			companyId:       "2330",
 			startDate:       time.Now(),
 			endDate:         time.Now().AddDate(0, 0, 1),
 			expectFail:      false,
-			expectCount:     2,
-			expectCompanyID: []string{"2330", "2454"},
+			expectCount:     1,
+			expectCompanyID: []string{"2330"},
 			expectError:     nil,
 		},
 		{
 			name:            "invalid zero time",
+			companyId:       "2330",
 			endDate:         time.Time{},
 			startDate:       time.Time{},
 			expectFail:      true,
@@ -218,6 +218,7 @@ func TestGetStockPrice(t *testing.T) {
 		},
 		{
 			name:            "invalid early endDate",
+			companyId:       "2330",
 			endDate:         time.Now(),
 			startDate:       time.Now(),
 			expectFail:      true,
@@ -229,7 +230,7 @@ func TestGetStockPrice(t *testing.T) {
 
 	for _, test := range subtests {
 		t.Run(test.name, func(t *testing.T) {
-			results, err := stock.GetStockPrice(test.startDate, test.endDate)
+			results, err := stock.GetStockPrice(test.companyId, test.startDate, test.endDate)
 
 			if test.expectFail {
 				assert.Nil(t, results)
