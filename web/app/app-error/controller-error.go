@@ -7,7 +7,7 @@ import (
 
 type ControllerError struct {
 	Layer string
-	Err   AppError
+	appError
 }
 
 func (e *ControllerError) Error() string {
@@ -15,7 +15,7 @@ func (e *ControllerError) Error() string {
 }
 
 func (e *ControllerError) Unwrap() error {
-	return e.Err.Unwrap()
+	return e.Err
 }
 
 func NewControllerError(err error) (e *ControllerError) {
@@ -26,7 +26,7 @@ func NewControllerError(err error) (e *ControllerError) {
 
 	return &ControllerError{
 		Layer: "Controller",
-		Err: AppError{
+		appError: appError{
 			Err:            err,
 			CallerFile:     frame.File,
 			CallerLine:     frame.Line,

@@ -7,7 +7,7 @@ import (
 
 type RoutingError struct {
 	Layer string
-	Err   AppError
+	appError
 }
 
 func (e *RoutingError) Error() string {
@@ -15,7 +15,7 @@ func (e *RoutingError) Error() string {
 }
 
 func (e *RoutingError) Unwrap() error {
-	return e.Err.Unwrap()
+	return e.Err
 }
 
 func NewRoutingError(err error) (e *RoutingError) {
@@ -26,7 +26,7 @@ func NewRoutingError(err error) (e *RoutingError) {
 
 	return &RoutingError{
 		Layer: "Routing",
-		Err: AppError{
+		appError: appError{
 			Err:            err,
 			CallerFile:     frame.File,
 			CallerLine:     frame.Line,

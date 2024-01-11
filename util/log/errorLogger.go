@@ -10,7 +10,7 @@ import (
 var errFileLogger *fileLogger
 var errTermLogger *terminalLogger
 
-func LogError(layer string, err *apperror.AppError) {
+func LogError(layer string, err apperror.Error) {
 	fileEnable := os.Getenv("logErrorFileEn") == "True"
 	if fileEnable {
 		logErrorFile(layer, err)
@@ -22,7 +22,7 @@ func LogError(layer string, err *apperror.AppError) {
 	}
 }
 
-func logErrorFile(layer string, err *apperror.AppError) {
+func logErrorFile(layer string, err apperror.Error) {
 	filename := "err-" + time.Now().Format("2006-01-02") + ".log"
 
 	// create new file if logger is nil
@@ -40,15 +40,15 @@ func logErrorFile(layer string, err *apperror.AppError) {
 			Logger:   logger,
 		}
 	}
-	errFileLogger.Logger.WithGroup("detail").Error(err.Err.Error(),
+	errFileLogger.Logger.WithGroup("detail").Error(err.Error(),
 		"layer", layer,
-		"file", err.CallerFile,
-		"line", err.CallerLine,
-		"function", err.CallerFunction,
+		"file", err.GetFile(),
+		"line", err.GetLine(),
+		"function", err.GetFunction(),
 	)
 }
 
-func logErrorTerm(layer string, err *apperror.AppError) {
+func logErrorTerm(layer string, err apperror.Error) {
 	if errTermLogger == nil {
 		errTermLogger = &terminalLogger{
 			Logger: slog.New(slog.NewTextHandler(os.Stdout, nil)),

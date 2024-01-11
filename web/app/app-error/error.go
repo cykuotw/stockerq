@@ -2,7 +2,6 @@ package apperror
 
 import (
 	"errors"
-	"fmt"
 )
 
 var (
@@ -27,18 +26,29 @@ var (
 	ErrReverseDate = errors.New("startDate much be ealier than endDate")
 )
 
-type AppError struct {
+type Error interface {
+	Error() string
+	Unwrap() error
+	GetFile() string
+	GetLine() int
+	GetFunction() string
+}
+
+type appError struct {
 	Err            error
 	CallerFile     string
 	CallerLine     int
 	CallerFunction string
 }
 
-func (e *AppError) Error() string {
-	return fmt.Sprintf("%s:%d %s error:%s",
-		e.CallerFile, e.CallerLine, e.CallerFunction, e.Err)
+func (e appError) GetFile() string {
+	return e.CallerFile
 }
 
-func (e *AppError) Unwrap() error {
-	return e.Err
+func (e appError) GetLine() int {
+	return e.CallerLine
+}
+
+func (e appError) GetFunction() string {
+	return e.CallerFunction
 }

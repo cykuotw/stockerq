@@ -14,7 +14,7 @@ func TestErrorLogger(t *testing.T) {
 	type testcase struct {
 		name            string
 		layer           string
-		apperror        apperror.AppError
+		apperror        apperror.Error
 		fileEnabled     bool
 		terminalEnabled bool
 		expectFail      bool
@@ -38,21 +38,21 @@ func TestErrorLogger(t *testing.T) {
 		},
 	}
 
-	var getRandomErr = func() (string, *apperror.AppError) {
+	var getRandomErr = func() (string, apperror.Error) {
 		randNum := rand.Uint32() % 3
 		err := fmt.Errorf("test error")
 		switch randNum {
 		case 0:
 			errC := apperror.NewControllerError(err)
-			return errC.Layer, &errC.Err
+			return errC.Layer, errC
 
 		case 1:
 			errM := apperror.NewModelError(err)
-			return errM.Layer, &errM.Err
+			return errM.Layer, errM
 
 		case 2:
 			errR := apperror.NewRoutingError(err)
-			return errR.Layer, &errR.Err
+			return errR.Layer, errR
 		}
 
 		return "", nil
